@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小猪的网站</title>
+    <script src="https://cdn.tailwindcss.com/3.3.3"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #e6f2ff;
+            transition: all 0.3s ease;
+        }
+        body.dark-mode {
+            background-color: #121212;
+            color: #fff;
+        }
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            max-width: 800px;
+        }
+        .circle-button {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        body.dark-mode .circle-button {
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+        .circle-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        .circle-button i {
+            font-size: 36px;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        body.dark-mode .circle-button i {
+            color: black;
+        }
+        .windows-icon {
+            display: flex;
+            flex-wrap: wrap;
+            width: 40px;
+            height: 40px;
+            justify-content: space-between;
+            align-content: space-between;
+        }
+        .windows-square {
+            width: 18px;
+            height: 18px;
+            background-color: white;
+            transition: all 0.3s ease;
+        }
+        body.dark-mode .windows-square {
+            background-color: black;
+        }
+        .submenu {
+            position: absolute;
+            top: 120px;
+            left: 0;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        body.dark-mode .submenu {
+            background-color: #333;
+        }
+        .submenu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .submenu-item {
+            padding: 12px 20px;
+            color: #333;
+            text-decoration: none;
+            display: block;
+            transition: all 0.2s ease;
+        }
+        body.dark-mode .submenu-item {
+            color: white;
+        }
+        .submenu-item:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        body.dark-mode .submenu-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .settings-panel, .pig-panel, .articles-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            max-width: 80%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        body.dark-mode .settings-panel,
+        body.dark-mode .pig-panel,
+        body.dark-mode .articles-panel {
+            background-color: #333;
+            color: white;
+        }
+        .settings-panel.active,
+        .pig-panel.active,
+        .articles-panel.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 50%;
+        }
+        .close-btn:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+        body.dark-mode .close-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .pig-panel-content {
+            text-align: center;
+            padding: 20px;
+        }
+        .pig-panel-content h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        .pig-panel-content p {
+            font-size: 18px;
+        }
+        .article {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        body.dark-mode .article {
+            border-bottom-color: #555;
+        }
+        .article h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #4f46e5;
+        }
+        body.dark-mode .article h3 {
+            color: #8b5cf6;
+        }
+        .article p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        .articles-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #4f46e5;
+        }
+        body.dark-mode .articles-title {
+            color: #8b5cf6;
+        }
+    </style>
+</head>
+<body>
+    <div class="button-container">
+        <div class="circle-button" id="windows-button">
+            <div class="windows-icon">
+                <div class="windows-square"></div>
+                <div class="windows-square"></div>
+                <div class="windows-square"></div>
+                <div class="windows-square"></div>
+            </div>
+            <div class="submenu" id="windows-submenu">
+                <a href="https://cn.bing.com" class="submenu-item">Bing 搜索</a>
+                <a href="https://cn.bing.com" class="submenu-item">Bing 主页</a>
+            </div>
+        </div>
+        <a href="xzsearch.html" class="circle-button"><i class="fas fa-search"></i></a>
+        <div class="circle-button" id="articles-button"><i class="fas fa-book"></i></div>
+        <div class="circle-button" id="settings-button"><i class="fas fa-cog"></i></div>
+        <div class="circle-button" id="pig-button"><i class="fas fa-user"></i></div>
+    </div>
+    <div class="overlay" id="overlay"></div>
+    <div class="settings-panel" id="settings-panel">
+        <div class="close-btn" id="close-settings">
+            <i class="fas fa-times"></i>
+        </div>
+        <h2 class="text-xl font-bold mb-4">设置</h2>
+        <div class="flex items-center justify-between mb-4">
+            <span>深色模式</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="dark-mode-toggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+    <div class="pig-panel" id="pig-panel">
+        <div class="close-btn" id="close-pig">
+            <i class="fas fa-times"></i>
+        </div>
+        <div class="pig-panel-content">
+            <h2>小猪的网站</h2>
+            <p>欢迎你来玩，祝你天天开心</p>
+        </div>
+    </div>
+    <div class="articles-panel" id="articles-panel">
+        <div class="close-btn" id="close-articles">
+            <i class="fas fa-times"></i>
+        </div>
+        <h2 class="articles-title">小猪的故事</h2>
+        <div class="article">
+            <h3>《肥小猪》</h3>
+            <p>从前有一只小猪，她很肥，长的也不好。大家都嫌弃她，她很伤心。一天晚上，她做了一个梦，梦见一个仙女对她说："你到温泉谷去，找到一块宝玉，服下后，第二天就会变得很美！"第二天，小猪醒了，她背好包袱，上路了。</p>
+            <p>小猪来到了温泉谷，那啥也没有，小猪失望了，这时出现了一个仙女，仙女说："你要经过一个难关，才能获得宝玉。"说着，仙女就不见了。这时，天空变暗了，小猪害怕极了，她全身哆嗦得不得了，这时，一个妖怪出现了，小猪问："你要干什么？"妖怪说："我要消灭这里的人。"小猪想，我就是死，也要保护大家，小猪坚决地说："要消灭他们，先过我这关。"妖怪冲了上去，小猪放了一个超级大屁，把妖怪吹走了。</p>
+            <p>天空又亮了，小猪回到家里，第二天，她发现自己不肥了，长相也好了。她高兴极了。任何事都要经过努力才能成功！</p>
+        </div>
+        <div class="article">
+            <h3>《小绿猪》</h3>
+            <p>在一个下完雨过后的阳光明媚的星期天里，小绿猪和她的好朋友，粉红小兔，黄仓鼠，紫狗还有彩虹姐姐一起玩。小绿猪和她的好朋友，粉红小兔，黄仓鼠，紫狗在玩捉迷藏。彩虹姐姐在天空上为小绿猪她们加油。粉红小兔藏完了，黄仓鼠藏完了，紫狗也藏完了。该轮到小猪了。"一二三四五……"小伙伴们数着数字。</p>
+            <p>小猪怎么也想不出她该藏自哪里。她看着彩虹姐姐，彩虹姐姐悄悄的说："看看那边是什么？"小绿猪往旁边一看，叫道："呀，有一片茂密的大森林，小绿猪想："藏在那里，她们肯定发现不了我的藏身之处的。"不过，小猪的喊叫声，小伙伴们是听不见的。小猪兴奋的奔跑过去。"……十八十九二十"，小伙伴们盼望以旧地说，"我们来找你了。"其实，小伙伴早就知道了小猪的藏身之地，因为，小猪藏的位置很安全也没人藏到那里去过。小伙伴们也奔向茂密的大森林。</p>
+            <p>在说说小猪，小猪跑的那条路正好在刷油漆，小猪的眼睛一直盯着大森林，没有看到脚底下有一桶彩色的油漆，彩虹姐姐刚刚要提醒小猪，可是，还没等到彩虹姐姐张口，小猪就躺在了油漆上，油漆桶全倒在了小猪的身上。小猪变成了彩色的。小绿猪本来想要起来的，没有想到，小猪觉得这个油漆坑很舒服。就在里面呼呼大睡。嘴巴还唱着小曲，彩虹姐姐见它很舒服自在，就没有管他。</p>
+            <p>小伙伴们争先恐后的跑过去，都想先找到小猪，因为，谁先找到小猪，谁就是捉迷藏大王。粉红小兔跑的很慢，黄仓鼠，紫狗跑在前面。她们刚刚跑到小猪摔倒的地方，起初，黄仓鼠，紫狗还认为那是一朵花呢。彩虹姐姐觉得又有好戏看了，所以，没有告诉黄仓鼠，紫狗，是小猪。正当这时，小猪也睡醒了。她向黄仓鼠，紫狗打招呼。黄仓鼠，紫狗还以为是一个油漆怪物呢，吓得直跑。一边跑一边叫喊："啊！啊！有怪物，快逃呀！啊！有怪物……"刚刚好碰见跑过去的粉红小兔，粉红小兔问黄仓鼠，紫狗："你们为什么要往回跑？你们不想得到捉迷藏大王啦，得到捉迷藏大王可有奖品的，奖品是一条裙子，一条裤子，一对袜子，一双鞋子呢！你们不要，我要！"黄仓鼠，紫狗拼命的跑，根本不把小兔的话放在心上，粉红小兔奇怪的问："你们干什么逃跑呀？" 黄仓鼠，紫狗这才停下来，她们一起说："有一个'油漆怪物'，你不怕？" 粉红小兔大吃一惊："啊！赶紧跑哇！……" 粉红小兔更加埋怨自己跑步太慢，粉红小兔急的哇哇大哭起来。黄仓鼠，紫狗根本管不了粉红小兔，他们只顾着自己快点逃跑，哪能顾的上粉红小兔呢！</p>
+            <p>小猪看了哈哈大笑起来，肚子都快笑破了。彩虹姐姐劝他说："你看，你都快把小伙伴们给吓跑了。"小猪却说："你看，你一下来就能看见真么好笑的事儿，你怎么还抱怨呢？"彩虹姐姐说："这回，可不是我在抱怨你，真正抱怨的，我看呀，还是小伙伴呢！" 小绿猪说："她们又不知道是我，我怕什么呀？"彩虹姐姐说："你怎么就这么糊涂呢？她们指的'油漆怪物'不就是指的你？" 小绿猪开始顶嘴了："我说彩虹姐姐呀，彩虹姐姐。只要她们不说我，小绿猪，我就可以当作没人说，再说，就算她们说，她们说的是我，又不是你，你就别操心了，行吧？别总在我耳朵旁边说个不停，像蚊子。"彩虹姐姐听了，生气极了说："我还不是为你好，如果不是为你，我才不说你。不过，你可别后悔。"小猪说："我才不后悔，他们一定不知道是我。"</p>
+            <p>小伙伴们终于离小绿猪远远的。但是，小伙伴们怕"油漆怪物"追过来，就商量，先在粉红小兔家躲避一会儿。小伙伴们藏在床底下，不敢出来，甚至不敢呼吸，怕"油漆怪物"发现她们。粉红小兔"噗嗤噗嗤噗嗤……"原来，粉红小兔感冒了，扑哧是打的喷嚏。这个喷嚏可把黄仓鼠，紫狗吓得心惊胆颤。都责怪粉红小兔，粉红小兔，也感到了内疚。</p>
+            <p>小猪，也觉得闹够了。就回家去洗了个凉水澡，一边洗，一边唱歌。："拉拉拉，我要洗澡，我要洗个凉水澡。拉拉拉，洗个干净，把肚子洗的白白的，嘿嘿！全身上下，没有一点灰尘。拉拉拉……"小猪为了洗得干干净净的，所以，一共洗了三次。她换上了一条绿色的裙子，小绿猪一边照着镜子一边唱起歌来："绿色的裙子，粉红色的袜子，紫色的鞋子，金黄色手套。这种搭配，帅的要命。谁能比我，搭配的更好？拉拉拉，咚咚咚……"小绿猪换好了衣服，唱完了歌。心情非常愉快。</p>
+            <p>小绿猪一边哼着小曲，一边蹦蹦跳跳的准备去小伙伴的家。咚咚嗒，咚咚嗒……小猪敲着黄仓鼠的门，可是，黄仓鼠不在家，小猪有些奇怪。她又来到紫狗家，咚咚咚，咚咚咚……小猪同样敲了紫狗家的门，结果和去黄仓鼠家一样，紫狗不在家。小猪，更加奇怪了。但是，她没有回家，而是带着最后一点希望去粉红小兔家.叮叮咚，叮叮咚……没有人开门。小绿猪以为，她把小伙伴吓跑了，但是，她使劲得一推门，门开了。粉红小兔，黄仓鼠，紫狗还以为是"油漆怪物"呢。都叫道："'油漆怪物'追来了！"小猪笑呵呵地说："是我，小绿猪！" 粉红小兔，黄仓鼠，紫狗才松了一口气。</p>
+        </div>
+        <div class="article">
+            <h3>《得意的小猪》</h3>
+            <p>以前，有一头小猪，每天好吃懒做，也从不锻炼身体，还很自恋，老是认为别的动物都不如他。一天，小猪叫上乌龟，刺猬，蜗牛和蚂蚁。要和他们玩比赛跑步的游戏，看谁跑得最快。并邀请了大树爷爷做裁判。</p>
+            <p>第一轮开始了，小猪和乌龟各自站在了起跑线上。只听见大树爷爷"跑"的一声令下，小猪扒着四条腿飞快的向前冲着，不一会就到了终止线，而乌龟却慢慢吞吞的，半天都没有到达。第一轮，小猪获胜。第二轮是小猪和蜗牛的比赛，同样是小猪得胜，第三轮是小猪和蚂蚁的比赛，照样是小猪得胜。这时，乌龟，刺猬和蚂蚁都夸小猪是个能跑高手，小猪可得意了。</p>
+            <p>"我真高兴，今天我听到了这么多朋友赞美我！"小猪得意洋洋的对大树说道。"哦?你为什么那么高兴?"大树爷爷问道。"你看乌龟、刺猬、蜗牛、蚂蚁都没有跑过我，还夸我是个能跑高手，看样子啊，没有人能跑过我了，我肯定很高兴啦！"大树爷爷听罢，笑着说："哈哈！原来是这么回事呀！不过，我那天倒是听野狗说过你，它说你跑步慢得可怜。""谁说的?我不是跑得很快嘛！你都看到了，动物们都跑不过我啊！更何况有那么多的朋友说我是能跑高手那我就是能跑高手了。""你呀，你呀！你只看到了比你跑得慢的动物，你就觉得自己是最优秀的了，你怎么不去跟比你跑得快的动物比呢?"大树听了它的话，摇了摇头说。</p>
+        </div>
+        <div class="article">
+            <h3>《小猪失眠的故事》</h3>
+            <p>小猪最近失眠了，小猪不知是怎么了，就是睡不着，小猪想让自己的好朋友小熊陪自己，可是小熊很想睡觉，它并不想陪伴小猪，两个人大吵一架。</p>
+            <p>第二天小猪和小熊都很后悔，小猪觉得自己太自私了，不应该只为了自己就去打扰别人。小熊也很后悔，小熊觉得是自己的错，自己不关心朋友，是自己太自私了。可两个人都爱面子，谁也不肯先低下头去道歉，一天，小熊出来散步，看到山羊爷爷采了一大块的云朵往家走，小熊好奇地问："羊爷爷……羊爷爷……你拿着云朵要做什么？"羊爷爷说："羊奶奶最近失眠睡不着，我要用云朵给它做一个枕头，好让它睡的香。"小熊高兴地跳了起来，因为它决定送小熊一个云朵被子，让小熊能安心睡觉。</p>
+            <p>小熊取了一个袋子，到山顶的处，摘下好多的云，直到把袋子装满，小熊把云朵被子做好，羞着脸送给了小猪，小猪很感谢，也从屋子里面取出一坛子的蜂蜜，递给了小熊。夜晚，小猪盖着小熊送给它的云朵被子舒服极了，温暖的睡着，果然不失眠了。小熊吃着小猪送给它的蜂蜜，香甜的蜂蜜甜到了小熊的心里，俩个好朋友的关系更亲近了！</p>
+        </div>
+        <div class="article">
+            <h3>《小猪和小兔的游乐场之约》</h3>
+            <p>在大森林里，住着小兔和小猪。他们是非常亲密的好朋友。有一天，两个好朋友约好了一起去游乐场玩。哇！游乐场里好玩的可真多啊！有小飞机、小火车、碰碰车、木马，还有好多好玩的游乐设施呢！小兔和小猪都看不过来了。他们俩欢呼着，先是开心地开小火车，又一起坐滑翔飞船，还一起骑着木马随着音乐转呀转……玩得有点累了，他们俩一边喝水一边商量接下来玩什么。</p>
+            <p>小猪说："你先陪我玩碰碰车呗？"小兔说："不行，我要玩小飞机！你先陪我玩！""先玩碰碰车！""先玩小飞机！"他们俩吵得不可开交。最后一个也没玩成。回家的路上，小猪撅着嘴，一直闷闷不乐。小兔心里想：小猪比我大而且是男生，就该让着我。哼！不理就不理！有什么了不起！</p>
+            <p>过了几天，小猪觉得自己玩很没意思，小兔也觉得很孤单。于是，他们俩决定和自己的朋友道歉。在小桥上小兔和小猪相遇了。小猪不好意思地低下头说："小兔，上回是我不好，请原谅。"小兔也羞红了脸说："是我不好。我不应该只顾自己，不顾别人。我们和好吧！"说着两个好朋友开心地笑了。大森林里又回荡着他们的欢声笑语了。</p>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const windowsButton = document.getElementById('windows-button');
+            const windowsSubmenu = document.getElementById('windows-submenu');
+            const settingsButton = document.getElementById('settings-button');
+            const pigButton = document.getElementById('pig-button');
+            const articlesButton = document.getElementById('articles-button');
+            const settingsPanel = document.getElementById('settings-panel');
+            const pigPanel = document.getElementById('pig-panel');
+            const articlesPanel = document.getElementById('articles-panel');
+            const overlay = document.getElementById('overlay');
+            const darkModeToggle = document.getElementById('dark-mode-toggle');
+            const closeSettingsButton = document.getElementById('close-settings');
+            const closePigButton = document.getElementById('close-pig');
+            const closeArticlesButton = document.getElementById('close-articles');
+
+            // 检查本地存储中的深色模式设置
+            if (localStorage.getItem('darkMode') === 'enabled') {
+                document.body.classList.add('dark-mode');
+                darkModeToggle.checked = true;
+            }
+
+            // 打开Windows子菜单
+            windowsButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                windowsSubmenu.classList.toggle('active');
+            });
+
+            // 点击其他地方关闭子菜单
+            document.addEventListener('click', function() {
+                windowsSubmenu.classList.remove('active');
+            });
+
+            // 打开设置面板
+            settingsButton.addEventListener('click', function() {
+                settingsPanel.classList.add('active');
+                overlay.classList.add('active');
+                windowsSubmenu.classList.remove('active');
+            });
+
+            // 打开小猪面板
+            pigButton.addEventListener('click', function() {
+                pigPanel.classList.add('active');
+                overlay.classList.add('active');
+                windowsSubmenu.classList.remove('active');
+            });
+
+            // 打开文章面板
+            articlesButton.addEventListener('click', function() {
+                articlesPanel.classList.add('active');
+                overlay.classList.add('active');
+                windowsSubmenu.classList.remove('active');
+            });
+
+            // 关闭设置面板
+            closeSettingsButton.addEventListener('click', function() {
+                settingsPanel.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+
+            // 关闭小猪面板
+            closePigButton.addEventListener('click', function() {
+                pigPanel.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+
+            // 关闭文章面板
+            closeArticlesButton.addEventListener('click', function() {
+                articlesPanel.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+
+            // 点击遮罩层关闭所有面板
+            overlay.addEventListener('click', function() {
+                settingsPanel.classList.remove('active');
+                pigPanel.classList.remove('active');
+                articlesPanel.classList.remove('active');
+                overlay.classList.remove('active');
+                windowsSubmenu.classList.remove('active');
+            });
+
+            // 切换深色模式
+            darkModeToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    document.body.classList.add('dark-mode');
+                    localStorage.setItem('darkMode', 'enabled');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    localStorage.setItem('darkMode', 'disabled');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
